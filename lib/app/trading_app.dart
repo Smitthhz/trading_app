@@ -9,6 +9,7 @@ import '../features/home/presentation/pages/home_page.dart';
 import '../features/market/domain/repositories/market_repository.dart';
 import '../features/market/presentation/cubit/market_cubit.dart';
 import '../features/watchlists/presentation/cubit/watchlist_cubit.dart';
+import '../features/holdings/presentation/cubit/holdings_cubit.dart';
 
 class TradingApp extends StatelessWidget {
   const TradingApp({super.key});
@@ -30,6 +31,11 @@ class TradingApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => WatchlistCubit(
+            tradingStateCubit: context.read<TradingStateCubit>(),
+          ),
+        ),
+        BlocProvider(
+          create: (context) => HoldingsCubit(
             tradingStateCubit: context.read<TradingStateCubit>(),
           ),
         ),

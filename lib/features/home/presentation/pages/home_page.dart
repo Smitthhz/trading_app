@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../market/presentation/pages/market_overview_page.dart';
 import '../../../watchlists/presentation/pages/watchlist_page.dart';
+import '../../../holdings/presentation/pages/holdings_page.dart';
 import '../cubit/home_navigation_cubit.dart';
 
 class HomePage extends StatelessWidget {
@@ -25,7 +26,7 @@ class HomePage extends StatelessWidget {
           body: switch (selectedIndex) {
             0 => const MarketOverviewPage(),
             1 => const WatchlistPage(),
-            _ => const _PlannedFeature(message: 'Holdings are coming next.'),
+            _ => const HoldingsPage(),
           },
           bottomNavigationBar: NavigationBar(
             selectedIndex: selectedIndex,
@@ -52,19 +53,6 @@ class HomePage extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-class _PlannedFeature extends StatelessWidget {
-  const _PlannedFeature({required this.message});
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(message, style: Theme.of(context).textTheme.titleMedium),
     );
   }
 }
