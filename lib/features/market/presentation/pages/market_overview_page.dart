@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../domain/entities/stock_symbol.dart';
 import '../cubit/market_cubit.dart';
+import '../../../orders/presentation/pages/order_ticket_page.dart';
 
 class MarketOverviewPage extends StatelessWidget {
   const MarketOverviewPage({super.key});
@@ -160,6 +161,7 @@ class _QuoteRowState extends State<_QuoteRow>
                 ),
               ],
             ),
+            onTap: () => OrderTicketPage.push(context, widget.symbol),
           ),
         );
       },

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../market/domain/entities/stock_symbol.dart';
 import '../../../market/presentation/cubit/market_cubit.dart';
+import '../../../orders/presentation/pages/order_ticket_page.dart';
 import '../cubit/watchlist_cubit.dart';
 
 /// A single row in a watchlist showing a live quote for one symbol.
@@ -131,9 +132,7 @@ class _WatchlistQuoteRowState extends State<WatchlistQuoteRow>
                 ),
               ],
             ),
-            onTap: () {
-              // Phase 4: navigate to order ticket
-            },
+            onTap: () => OrderTicketPage.push(context, widget.symbol),
           ),
         );
       },
