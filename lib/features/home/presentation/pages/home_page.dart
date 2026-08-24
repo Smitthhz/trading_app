@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../market/presentation/pages/market_overview_page.dart';
+import '../../../watchlists/presentation/pages/watchlist_page.dart';
 import '../cubit/home_navigation_cubit.dart';
 
 class HomePage extends StatelessWidget {
@@ -17,7 +18,7 @@ class HomePage extends StatelessWidget {
           appBar: AppBar(title: Text(_titles[selectedIndex])),
           body: switch (selectedIndex) {
             0 => const MarketOverviewPage(),
-            1 => const _PlannedFeature(message: 'Watchlists are coming next.'),
+            1 => const WatchlistPage(),
             _ => const _PlannedFeature(message: 'Holdings are coming next.'),
           },
           bottomNavigationBar: NavigationBar(

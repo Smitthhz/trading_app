@@ -9,6 +9,7 @@ import '../../features/market/data/repositories/market_repository_impl.dart';
 import '../../features/market/domain/repositories/market_repository.dart';
 import '../../features/market/presentation/cubit/market_cubit.dart';
 import '../presentation/cubit/trading_state_cubit.dart';
+import '../../features/watchlists/presentation/cubit/watchlist_cubit.dart';
 import '../seed/app_seed.dart';
 
 final serviceLocator = GetIt.instance;
@@ -42,5 +43,8 @@ Future<void> configureDependencies({SharedPreferences? preferences}) async {
   );
   serviceLocator.registerFactory(
     () => TradingStateCubit(repository: serviceLocator()),
+  );
+  serviceLocator.registerFactory(
+    () => WatchlistCubit(tradingStateCubit: serviceLocator()),
   );
 }

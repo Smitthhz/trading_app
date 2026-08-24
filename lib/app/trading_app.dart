@@ -7,6 +7,7 @@ import 'presentation/cubit/trading_state_cubit.dart';
 import '../features/home/presentation/cubit/home_navigation_cubit.dart';
 import '../features/home/presentation/pages/home_page.dart';
 import '../features/market/presentation/cubit/market_cubit.dart';
+import '../features/watchlists/presentation/cubit/watchlist_cubit.dart';
 
 class TradingApp extends StatelessWidget {
   const TradingApp({super.key});
@@ -19,6 +20,11 @@ class TradingApp extends StatelessWidget {
         BlocProvider(create: (_) => serviceLocator<MarketCubit>()),
         BlocProvider(
           create: (_) => serviceLocator<TradingStateCubit>()..load(),
+        ),
+        BlocProvider(
+          create: (context) => WatchlistCubit(
+            tradingStateCubit: context.read<TradingStateCubit>(),
+          ),
         ),
       ],
       child: MaterialApp(
