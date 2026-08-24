@@ -9,8 +9,8 @@
 | Phase 2 — Live Market Overview | ✅ **Complete** | 100% |
 | Phase 3 — Watchlists | ✅ **Complete** | 100% |
 | Phase 4 — Buy/Sell Ticket | ✅ **Complete** | 100% |
-| Phase 5 — Holdings & Live P&L | ❌ **Not started** | 0% |
-| Phase 6 — Quality, Tests & Submission | 🟡 **Partial** | ~35% |
+| Phase 5 — Holdings & Live P&L | ✅ **Complete** | 100% |
+| Phase 6 — Quality, Tests & Submission | 🟡 **Partial** | ~50% |
 
 ---
 
@@ -92,14 +92,17 @@ All exit criteria met.
 
 ---
 
-## Phase 5 — Holdings & Live P&L ❌ Not Started
+## Phase 5 — Holdings & Live P&L ✅ Complete
 
-- ❌ No holdings screen (tab is a placeholder)
-- ❌ No `HoldingsCubit`
-- ❌ No P&L calculations in the UI (invested value, current value, P&L ₹/%)
-- ❌ No portfolio summary widget
-- ❌ No sort (by P&L / symbol / value)
-- ✅ `Holding` domain entity exists (`symbol`, `quantity`, `averageCost`)
+All exit criteria met.
+
+- ✅ `HoldingsCubit` — manages holdings collection & sorting preference, automatically syncs with `TradingStateCubit` stream
+- ✅ `HoldingsSummaryCard` — live portfolio overview card with gradient background, showing Total Portfolio Value, Total Invested, and Total P&L (₹ & %)
+- ✅ `HoldingsSortBar` — interactive filter/sort chips (P&L ↓, P&L ↑, Symbol A–Z, Value ↓)
+- ✅ `HoldingRow` — per-holding `BlocConsumer` with tick flash animation, share count, average cost, live market value, live P&L badge, and quick +/- trade buttons
+- ✅ `HoldingsEmptyState` — clean, helpful empty state when no holdings exist
+- ✅ Holdings wired into `HomePage` bottom navigation
+- ✅ Weighted average cost correctly updated on every buy/sell executed in the app
 
 ---
 
