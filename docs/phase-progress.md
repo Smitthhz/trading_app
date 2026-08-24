@@ -8,7 +8,7 @@
 | Phase 1 — Data, Persistence & Realtime | ✅ **Complete** | 100% |
 | Phase 2 — Live Market Overview | ✅ **Complete** | 100% |
 | Phase 3 — Watchlists | ✅ **Complete** | 100% |
-| Phase 4 — Buy/Sell Ticket | 🟡 **Partial** | ~40% |
+| Phase 4 — Buy/Sell Ticket | ✅ **Complete** | 100% |
 | Phase 5 — Holdings & Live P&L | ❌ **Not started** | 0% |
 | Phase 6 — Quality, Tests & Submission | 🟡 **Partial** | ~35% |
 
@@ -76,19 +76,19 @@ All exit criteria met.
 
 ---
 
-## Phase 4 — Buy/Sell Ticket 🟡 Partial (~40%)
+## Phase 4 — Buy/Sell Ticket ✅ Complete
 
-**Done (domain layer):**
-- ✅ `ExecuteOrder` use case — full buy/sell validation, wallet deduction/credit, weighted average cost, order history
-- ✅ `Order`, `OrderSide`, `Wallet` domain entities
-- ✅ Validation rules: invalid quantity, insufficient balance, insufficient quantity
-- ✅ Single price snapshot at execution time
+All exit criteria met.
 
-**Missing (presentation layer):**
-- ❌ No order ticket UI screen
-- ❌ No `OrderBloc` (Bloc with idle→validating→submitting→success/failure states)
-- ❌ No confirmation screen showing executed price/value
-- ❌ Row tap → order ticket navigation not connected yet
+- ✅ `OrderBloc` with sealed states: `OrderEditing` → `OrderSubmitting` → `OrderSucceeded` / `OrderFailed`
+- ✅ LTP snapshot taken exactly once at `OrderSubmitRequested` — same value used for validation, mutation, history, and confirmation
+- ✅ `OrderTicketPage` — live LTP header (`BlocSelector`), animated Buy/Sell toggle, quantity input, projected value panel, balance/holding warnings
+- ✅ Inline validation: positive integer check, insufficient balance warning, insufficient shares warning
+- ✅ Submit button disabled until quantity is valid
+- ✅ `OrderConfirmationPage` — executed price, quantity, total value, updated wallet balance, timestamp
+- ✅ Market and Watchlist rows tap → `OrderTicketPage.push()`
+- ✅ On success: `TradingStateCubit.persist()` called atomically, then confirmation screen shown
+- ✅ On failure: `SnackBar` shown with human-readable error message
 
 ---
 
