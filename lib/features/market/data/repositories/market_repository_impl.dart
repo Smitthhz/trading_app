@@ -14,7 +14,14 @@ class MarketRepositoryImpl implements MarketRepository {
   Stream<Quote> get quoteTicks => _feed.ticks;
 
   @override
+  double get ticksPerSecond => _feed.ticksPerSecondPerStock;
+
+  @override
   void start() => _feed.start();
+
+  @override
+  void configureTickRate(double ticksPerSecond) =>
+      _feed.configureTickRate(ticksPerSecond);
 
   @override
   Future<void> dispose() => _feed.dispose();

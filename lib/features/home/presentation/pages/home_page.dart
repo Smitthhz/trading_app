@@ -15,7 +15,13 @@ class HomePage extends StatelessWidget {
     return BlocBuilder<HomeNavigationCubit, int>(
       builder: (context, selectedIndex) {
         return Scaffold(
-          appBar: AppBar(title: Text(_titles[selectedIndex])),
+          appBar: AppBar(
+            title: Text(_titles[selectedIndex]),
+            actions: [
+              // Debug speed toggle — only shown on the Market tab
+              if (selectedIndex == 0) const MarketSpeedToggle(),
+            ],
+          ),
           body: switch (selectedIndex) {
             0 => const MarketOverviewPage(),
             1 => const WatchlistPage(),

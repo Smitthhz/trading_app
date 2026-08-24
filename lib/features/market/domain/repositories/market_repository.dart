@@ -5,7 +5,11 @@ abstract interface class MarketRepository {
 
   Stream<Quote> get quoteTicks;
 
+  double get ticksPerSecond;
+
   void start();
+
+  void configureTickRate(double ticksPerSecond);
 
   Future<void> dispose();
 }
