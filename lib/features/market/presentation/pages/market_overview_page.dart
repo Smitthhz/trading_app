@@ -252,12 +252,9 @@ class _QuoteRowState extends State<_QuoteRow>
             return Card(
               margin: EdgeInsets.zero,
               clipBehavior: Clip.antiAlias,
-              child: Container(
-                decoration: BoxDecoration(
-                  // Flash overlay blended over the card surface
-                  color: trendColor.withAlpha(
-                    (_flashOpacity.value * 40).round(),
-                  ),
+              child: Ink(
+                color: trendColor.withAlpha(
+                  (_flashOpacity.value * 40).round(),
                 ),
                 child: child,
               ),

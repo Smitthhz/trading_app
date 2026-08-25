@@ -74,7 +74,7 @@ class _WatchlistQuoteRowState extends State<WatchlistQuoteRow>
 
         return AnimatedBuilder(
           animation: _flashOpacity,
-          builder: (context, child) => Container(
+          builder: (context, child) => Ink(
             color: flashColor.withAlpha((_flashOpacity.value * 40).round()),
             child: child,
           ),

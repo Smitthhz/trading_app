@@ -69,11 +69,23 @@ class WatchlistCubit extends Cubit<WatchlistState> {
 
   // ── Symbol operations ────────────────────────────────────────────────────────
 
-  Future<void> addSymbol(String watchlistId, StockSymbol symbol) async {
+  Future<void> addSymbol(String watchlistId, StockSymbol symbol) =>
+      addSymbols(watchlistId, [symbol]);
+
+  Future<void> addSymbols(
+    String watchlistId,
+    List<StockSymbol> symbols,
+  ) async {
+    if (symbols.isEmpty) return;
     final updated = [
       for (final w in state.watchlists)
         if (w.id == watchlistId)
-          w.copyWith(symbols: [...w.symbols, symbol])
+          w.copyWith(
+            symbols: [
+              ...w.symbols,
+              ...symbols.where((s) => !w.symbols.contains(s)),
+            ],
+          )
         else
           w,
     ];

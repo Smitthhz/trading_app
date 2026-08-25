@@ -34,18 +34,25 @@ void main() {
       await _settle(tester);
       expect(find.text('Add Stocks'), findsWidgets);
 
-      // Add RELIANCE.
+      // Select RELIANCE and TCS.
       await tester.tap(find.text('RELIANCE'));
+      await _settle(tester);
+      await tester.tap(find.text('TCS'));
+      await _settle(tester);
+
+      // Tap the bottom CTA to add both selected stocks.
+      await tester.tap(find.text('Add 2 Stocks'));
       await _settle(tester);
 
       expect(find.text('No stocks yet'), findsNothing);
       expect(find.text('RELIANCE'), findsOneWidget);
+      expect(find.text('TCS'), findsOneWidget);
 
       // Reopen the picker via the non-empty-state FAB and confirm the
-      // already-added symbol is disabled with an "Added" chip.
+      // already-added symbols are disabled with "Added" chips.
       await tester.tap(find.text('Add Stock'));
       await _settle(tester);
-      expect(find.text('Added'), findsOneWidget);
+      expect(find.text('Added'), findsNWidgets(2));
 
       await tester.tap(find.byIcon(Icons.close));
       await _settle(tester);

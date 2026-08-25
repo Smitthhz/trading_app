@@ -8,10 +8,12 @@ A fully simulated stock-trading app built with Flutter, featuring real-time mock
 
 | Feature | Details |
 |---|---|
-| **Live Market Overview** | 10 NSE-listed stocks with tick-by-tick mock price updates, green/red flash animations scoped per cell |
+| **Live Market Overview** | 10 NSE-listed stocks with tick-by-tick mock price updates, scoped green/red flash animations, sparklines, search, sorting, and a feed pause/resume control |
 | **Watchlists** | Create, rename, delete multiple watchlists; drag-to-reorder; swipe-to-remove; live quotes per row |
 | **Buy / Sell Orders** | Pre-filled order ticket with inline validation, LTP snapshot at submission, wallet deduction/credit |
 | **Holdings & P&L** | Live portfolio with current value, weighted average cost, P&L in ₹ and %; sortable by P&L / symbol / value |
+| **Activity** | Persisted order history, newest first |
+| **Theme** | System, light, and dark modes with a persisted preference |
 | **Persistence** | All state (wallet, holdings, watchlists, order history) survives app restarts via `shared_preferences` |
 
 ---
@@ -20,7 +22,7 @@ A fully simulated stock-trading app built with Flutter, featuring real-time mock
 
 ### Prerequisites
 
-- Flutter SDK — **stable channel** (`flutter channel stable && flutter upgrade`)
+- Flutter SDK — stable channel, compatible with Dart `^3.11.5`
 - Dart SDK `^3.11.5` (bundled with Flutter)
 - A connected device or simulator/emulator
 
@@ -91,17 +93,23 @@ Unit tests cover:
 - Holdings P&L computation
 - Persistence serialization/deserialization round-trips
 - Mock market feed tick determinism
+- Widget flows for market, watchlists, order submission, and holdings
 
 ---
 
 ## 🛠️ Debug Utilities
 
-The mock feed tick rate is controlled by a named constant in `MockMarketDataFeed`. Change it to stress-test rendering:
+The mock feed exposes named rates in `MockMarketDataFeed`. The default produces one update per second for each stock; switch the default to the stress rate to produce 50+ stock ticks per second overall:
 
 ```dart
 // lib/features/market/data/datasources/mock_market_data_feed.dart
-static const _tickInterval = Duration(milliseconds: 200); // ~5 ticks/sec
+static const standardTicksPerSecondPerStock = 1.0;
+static const stressTicksPerSecondPerStock = 5.0;
 ```
+
+## 🎥 Submission walkthrough
+
+Use the short [walkthrough script](docs/walkthrough-script.md) to record the required end-to-end demo. It covers the live market feed, watchlist management, buy/sell validation and execution, holdings P&L, sorting, persistence, and activity history in about three minutes.
 
 ---
 
