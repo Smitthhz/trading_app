@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/theme/market_colors.dart';
+import '../../../../core/widgets/sparkline.dart';
 import '../../../market/domain/entities/stock_symbol.dart';
 import '../../../market/presentation/cubit/market_cubit.dart';
 import '../../../orders/presentation/pages/order_ticket_page.dart';
@@ -63,9 +65,10 @@ class _WatchlistQuoteRowState extends State<WatchlistQuoteRow>
           prev.quoteFor(widget.symbol) != curr.quoteFor(widget.symbol),
       builder: (context, state) {
         final quote = state.quoteFor(widget.symbol);
+        final history = state.historyFor(widget.symbol);
         final isGain = quote.change.paise >= 0;
-        final flashColor =
-            isGain ? const Color(0xFF16A34A) : const Color(0xFFDC2626);
+        final marketColors = context.marketColors;
+        final flashColor = marketColors.forSign(isGain);
         final changeColor = flashColor;
         final percentage = _formatBasisPoints(quote.changeBasisPoints);
 
@@ -76,11 +79,12 @@ class _WatchlistQuoteRowState extends State<WatchlistQuoteRow>
             child: child,
           ),
           child: ListTile(
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 4,
+            ),
             leading: CircleAvatar(
-              backgroundColor:
-                  Theme.of(context).colorScheme.primaryContainer,
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
               child: Text(
                 widget.symbol.value.substring(0, 1),
                 style: TextStyle(
@@ -100,35 +104,46 @@ class _WatchlistQuoteRowState extends State<WatchlistQuoteRow>
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),
-            trailing: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  quote.lastTradedPrice.formatted,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15,
-                  ),
+                SizedBox(
+                  width: 36,
+                  height: 28,
+                  child: Sparkline(values: history, color: flashColor),
                 ),
-                const SizedBox(height: 4),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: isGain
-                        ? const Color(0xFFDCFCE7)
-                        : const Color(0xFFFEE2E2),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    '${isGain ? '+' : ''}${quote.change.formatted} ($percentage%)',
-                    style: TextStyle(
-                      color: changeColor,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
+                const SizedBox(width: 8),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      quote.lastTradedPrice.formatted,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: marketColors.containerForSign(isGain),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        '${isGain ? '+' : ''}${quote.change.formatted} ($percentage%)',
+                        style: TextStyle(
+                          color: changeColor,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

@@ -17,7 +17,13 @@ class MarketRepositoryImpl implements MarketRepository {
   double get ticksPerSecond => _feed.ticksPerSecondPerStock;
 
   @override
+  bool get isRunning => _feed.isRunning;
+
+  @override
   void start() => _feed.start();
+
+  @override
+  void stop() => _feed.stop();
 
   @override
   void configureTickRate(double ticksPerSecond) =>

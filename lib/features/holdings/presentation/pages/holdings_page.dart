@@ -32,8 +32,7 @@ class HoldingsPage extends StatelessWidget {
               child: BlocBuilder<MarketCubit, MarketState>(
                 // Re-sort only when quotes for held symbols change
                 buildWhen: (prev, curr) => holdingsState.holdings.any(
-                  (h) =>
-                      prev.quoteFor(h.symbol) != curr.quoteFor(h.symbol),
+                  (h) => prev.quoteFor(h.symbol) != curr.quoteFor(h.symbol),
                 ),
                 builder: (context, marketState) {
                   final sorted = holdingsState.sortedFor(marketState);

@@ -30,10 +30,12 @@ class WatchlistBody extends StatelessWidget {
             bottom: 80, // space for FAB
           ),
           itemCount: watchlist.symbols.length,
-          onReorder: (oldIndex, newIndex) {
-            context
-                .read<WatchlistCubit>()
-                .reorderSymbols(watchlist.id, oldIndex, newIndex);
+          onReorderItem: (oldIndex, newIndex) {
+            context.read<WatchlistCubit>().reorderSymbols(
+              watchlist.id,
+              oldIndex,
+              newIndex,
+            );
           },
           buildDefaultDragHandles: false,
           itemBuilder: (context, index) {
@@ -51,8 +53,7 @@ class WatchlistBody extends StatelessWidget {
           bottom: 16,
           child: FloatingActionButton.extended(
             heroTag: 'add_stock_${watchlist.id}',
-            onPressed: () =>
-                StockPickerSheet.show(context, watchlist.id),
+            onPressed: () => StockPickerSheet.show(context, watchlist.id),
             icon: const Icon(Icons.add),
             label: const Text('Add Stock'),
           ),

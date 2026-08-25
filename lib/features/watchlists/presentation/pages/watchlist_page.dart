@@ -80,9 +80,7 @@ class _WatchlistTabViewState extends State<_WatchlistTabView>
       );
       newController.addListener(() {
         if (!newController.indexIsChanging) {
-          context
-              .read<WatchlistCubit>()
-              .selectWatchlist(newController.index);
+          context.read<WatchlistCubit>().selectWatchlist(newController.index);
         }
       });
       _tabController.dispose();
@@ -117,8 +115,7 @@ class _WatchlistTabViewState extends State<_WatchlistTabView>
                   tabAlignment: TabAlignment.start,
                   tabs: widget.watchlists.map((w) {
                     return GestureDetector(
-                      onLongPress: () =>
-                          _showTabOptions(context, w, canDelete),
+                      onLongPress: () => _showTabOptions(context, w, canDelete),
                       child: Tab(text: w.name),
                     );
                   }).toList(),
@@ -171,8 +168,10 @@ class _WatchlistTabViewState extends State<_WatchlistTabView>
               title: const Text('Rename'),
               onTap: () async {
                 Navigator.of(sheetContext).pop();
-                final name =
-                    await showRenameWatchlistDialog(context, watchlist.name);
+                final name = await showRenameWatchlistDialog(
+                  context,
+                  watchlist.name,
+                );
                 if (name != null && context.mounted) {
                   await cubit.renameWatchlist(watchlist.id, name);
                 }
@@ -186,9 +185,7 @@ class _WatchlistTabViewState extends State<_WatchlistTabView>
                 ),
                 title: Text(
                   'Delete',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.error,
-                  ),
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
                 onTap: () async {
                   Navigator.of(sheetContext).pop();

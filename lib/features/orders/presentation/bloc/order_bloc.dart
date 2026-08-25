@@ -18,20 +18,21 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
   OrderBloc({
     required StockSymbol symbol,
     required OrderSide initialSide,
+    required TradingState initialTradingState,
     required TradingStateCubit tradingStateCubit,
     required MarketRepository marketRepository,
     required ExecuteOrder executeOrder,
-  })  : _tradingStateCubit = tradingStateCubit,
-        _marketRepository = marketRepository,
-        _executeOrder = executeOrder,
-        super(
-          OrderEditing(
-            symbol: symbol,
-            side: initialSide,
-            rawQuantity: '',
-            tradingState: tradingStateCubit.state.tradingState!,
-          ),
-        ) {
+  }) : _tradingStateCubit = tradingStateCubit,
+       _marketRepository = marketRepository,
+       _executeOrder = executeOrder,
+       super(
+         OrderEditing(
+           symbol: symbol,
+           side: initialSide,
+           rawQuantity: '',
+           tradingState: initialTradingState,
+         ),
+       ) {
     on<OrderSideToggled>(_onSideToggled);
     on<OrderQuantityChanged>(_onQuantityChanged);
     on<OrderSubmitRequested>(_onSubmitRequested);
@@ -42,17 +43,41 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
   final ExecuteOrder _executeOrder;
 
   void _onSideToggled(OrderSideToggled event, Emitter<OrderState> emit) {
-    if (state is! OrderEditing) return;
-    final s = state as OrderEditing;
-    final nextSide =
-        s.side == OrderSide.buy ? OrderSide.sell : OrderSide.buy;
-    emit(s.copyWith(side: nextSide));
+    final editing = _resumeEditing();
+    if (editing == null) return;
+    final nextSide = editing.side == OrderSide.buy
+        ? OrderSide.sell
+        : OrderSide.buy;
+    emit(editing.copyWith(side: nextSide));
   }
 
-  void _onQuantityChanged(OrderQuantityChanged event, Emitter<OrderState> emit) {
-    if (state is! OrderEditing) return;
-    final s = state as OrderEditing;
-    emit(s.copyWith(rawQuantity: event.raw));
+  void _onQuantityChanged(
+    OrderQuantityChanged event,
+    Emitter<OrderState> emit,
+  ) {
+    final editing = _resumeEditing();
+    if (editing == null) return;
+    emit(editing.copyWith(rawQuantity: event.raw, clearError: true));
+  }
+
+  /// Returns the current [OrderEditing] state to mutate, reconstructing one
+  /// from [OrderFailed] if needed — otherwise a failed order permanently
+  /// locks the ticket, since neither side-toggle nor quantity edits are
+  /// handled outside [OrderEditing].
+  OrderEditing? _resumeEditing() {
+    final current = state;
+    if (current is OrderEditing) return current;
+    if (current is OrderFailed) {
+      final tradingState = _tradingStateCubit.state.tradingState;
+      if (tradingState == null) return null;
+      return OrderEditing(
+        symbol: current.symbol,
+        side: current.side,
+        rawQuantity: '',
+        tradingState: tradingState,
+      );
+    }
+    return null;
   }
 
   Future<void> _onSubmitRequested(
@@ -71,16 +96,19 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
     emit(OrderSubmitting(symbol: s.symbol, side: s.side, quantity: qty));
 
     // Snapshot the current quote exactly once
-    final quote = _marketRepository.currentQuotes
-        .firstWhere((q) => q.symbol == s.symbol);
+    final quote = _marketRepository.currentQuotes.firstWhere(
+      (q) => q.symbol == s.symbol,
+    );
 
     final currentState = _tradingStateCubit.state.tradingState;
     if (currentState == null) {
-      emit(OrderFailed(
-        symbol: s.symbol,
-        side: s.side,
-        message: 'App state not ready. Please try again.',
-      ));
+      emit(
+        OrderFailed(
+          symbol: s.symbol,
+          side: s.side,
+          message: 'App state not ready. Please try again.',
+        ),
+      );
       return;
     }
 

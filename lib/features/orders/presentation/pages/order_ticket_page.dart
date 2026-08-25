@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/presentation/cubit/trading_state_cubit.dart';
 import '../../../../core/money/money.dart';
+import '../../../../core/theme/market_colors.dart';
 import '../../../market/domain/entities/stock_symbol.dart';
 import '../../../market/domain/repositories/market_repository.dart';
 import '../../../market/presentation/cubit/market_cubit.dart';
@@ -23,11 +24,22 @@ class OrderTicketPage extends StatelessWidget {
   final OrderSide initialSide;
 
   /// Push this page onto the navigator stack.
+  ///
+  /// No-ops (with a snackbar) if the persisted trading state hasn't finished
+  /// its initial async load yet — [OrderBloc] requires it to seed the ticket.
   static Future<void> push(
     BuildContext context,
     StockSymbol symbol, {
     OrderSide initialSide = OrderSide.buy,
   }) {
+    final tradingState = context.read<TradingStateCubit>().state.tradingState;
+    if (tradingState == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('App state not ready. Please try again.')),
+      );
+      return Future.value();
+    }
+
     return Navigator.of(context).push(
       MaterialPageRoute(
         builder: (routeContext) => MultiBlocProvider(
@@ -37,6 +49,7 @@ class OrderTicketPage extends StatelessWidget {
               create: (_) => OrderBloc(
                 symbol: symbol,
                 initialSide: initialSide,
+                initialTradingState: tradingState,
                 tradingStateCubit: context.read<TradingStateCubit>(),
                 marketRepository: context.read<MarketRepository>(),
                 executeOrder: ExecuteOrder(),
@@ -103,11 +116,9 @@ class _TicketBodyState extends State<_TicketBody> {
     return BlocBuilder<OrderBloc, OrderState>(
       builder: (context, state) {
         final isSubmitting = state is OrderSubmitting;
-        final editing =
-            state is OrderEditing ? state : null;
+        final editing = state is OrderEditing ? state : null;
         final isBuy = (editing?.side ?? OrderSide.buy) == OrderSide.buy;
-        final sideColor =
-            isBuy ? const Color(0xFF16A34A) : const Color(0xFFDC2626);
+        final sideColor = context.marketColors.forSign(isBuy);
 
         return SingleChildScrollView(
           padding: const EdgeInsets.all(20),
@@ -123,9 +134,9 @@ class _TicketBodyState extends State<_TicketBody> {
                 isBuy: isBuy,
                 onToggle: isSubmitting
                     ? null
-                    : () => context
-                        .read<OrderBloc>()
-                        .add(const OrderSideToggled()),
+                    : () => context.read<OrderBloc>().add(
+                        const OrderSideToggled(),
+                      ),
               ),
               const SizedBox(height: 24),
 
@@ -142,9 +153,8 @@ class _TicketBodyState extends State<_TicketBody> {
                   errorText: editing?.parseError,
                   suffixText: 'shares',
                 ),
-                onChanged: (val) => context
-                    .read<OrderBloc>()
-                    .add(OrderQuantityChanged(val)),
+                onChanged: (val) =>
+                    context.read<OrderBloc>().add(OrderQuantityChanged(val)),
               ),
               const SizedBox(height: 20),
 
@@ -167,9 +177,9 @@ class _TicketBodyState extends State<_TicketBody> {
                 ),
                 onPressed: isSubmitting || !(editing?.canSubmit ?? false)
                     ? null
-                    : () => context
-                        .read<OrderBloc>()
-                        .add(const OrderSubmitRequested()),
+                    : () => context.read<OrderBloc>().add(
+                        const OrderSubmitRequested(),
+                      ),
                 child: isSubmitting
                     ? const SizedBox(
                         height: 20,
@@ -203,8 +213,11 @@ class _SymbolHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<MarketCubit, MarketState,
-        ({Money ltp, Money change, int basisPoints})>(
+    return BlocSelector<
+      MarketCubit,
+      MarketState,
+      ({Money ltp, Money change, int basisPoints})
+    >(
       selector: (state) {
         final q = state.quoteFor(symbol);
         return (
@@ -215,8 +228,7 @@ class _SymbolHeader extends StatelessWidget {
       },
       builder: (context, data) {
         final isGain = data.change.paise >= 0;
-        final changeColor =
-            isGain ? const Color(0xFF16A34A) : const Color(0xFFDC2626);
+        final changeColor = context.marketColors.forSign(isGain);
         final pct = _fmtBp(data.basisPoints);
         return Container(
           padding: const EdgeInsets.all(20),
@@ -321,10 +333,9 @@ class _LiveProjection extends StatelessWidget {
       selector: (state) => state.quoteFor(symbol).lastTradedPrice,
       builder: (context, ltp) {
         final projected = qty > 0 ? ltp.multiply(qty) : Money.zero;
-        final canAfford = walletBalance == null ||
-            walletBalance!.compareTo(projected) >= 0;
-        final enoughShares =
-            heldQuantity == null || heldQuantity! >= qty;
+        final canAfford =
+            walletBalance == null || walletBalance!.compareTo(projected) >= 0;
+        final enoughShares = heldQuantity == null || heldQuantity! >= qty;
 
         return Container(
           padding: const EdgeInsets.all(16),
@@ -463,8 +474,22 @@ class _SideToggle extends StatelessWidget {
       padding: const EdgeInsets.all(4),
       child: Row(
         children: [
-          Expanded(child: _SideButton(label: 'BUY', selected: isBuy, color: const Color(0xFF16A34A), onTap: isBuy ? null : onToggle)),
-          Expanded(child: _SideButton(label: 'SELL', selected: !isBuy, color: const Color(0xFFDC2626), onTap: !isBuy ? null : onToggle)),
+          Expanded(
+            child: _SideButton(
+              label: 'BUY',
+              selected: isBuy,
+              color: context.marketColors.gain,
+              onTap: isBuy ? null : onToggle,
+            ),
+          ),
+          Expanded(
+            child: _SideButton(
+              label: 'SELL',
+              selected: !isBuy,
+              color: context.marketColors.loss,
+              onTap: !isBuy ? null : onToggle,
+            ),
+          ),
         ],
       ),
     );

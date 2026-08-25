@@ -57,8 +57,13 @@ class OrderEditing extends OrderState {
   }
 
   @override
-  List<Object?> get props =>
-      [symbol, side, rawQuantity, tradingState, parseError];
+  List<Object?> get props => [
+    symbol,
+    side,
+    rawQuantity,
+    tradingState,
+    parseError,
+  ];
 }
 
 /// Waiting for the use-case to complete.
@@ -79,10 +84,7 @@ class OrderSubmitting extends OrderState {
 
 /// Order executed successfully.
 class OrderSucceeded extends OrderState {
-  const OrderSucceeded({
-    required this.order,
-    required this.newState,
-  });
+  const OrderSucceeded({required this.order, required this.newState});
 
   final Order order;
   final TradingState newState;

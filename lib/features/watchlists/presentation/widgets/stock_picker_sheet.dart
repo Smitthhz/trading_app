@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/theme/market_colors.dart';
 import '../../../market/domain/entities/quote.dart';
 import '../../../market/domain/entities/stock_symbol.dart';
 import '../../../market/presentation/cubit/market_cubit.dart';
@@ -32,15 +33,14 @@ class StockPickerSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final addedSymbols = context
-        .select<WatchlistCubit, List<StockSymbol>>(
-          (cubit) => cubit.state.watchlists
-              .firstWhere(
-                (w) => w.id == watchlistId,
-                orElse: () => cubit.state.watchlists.first,
-              )
-              .symbols,
-        );
+    final addedSymbols = context.select<WatchlistCubit, List<StockSymbol>>(
+      (cubit) => cubit.state.watchlists
+          .firstWhere(
+            (w) => w.id == watchlistId,
+            orElse: () => cubit.state.watchlists.first,
+          )
+          .symbols,
+    );
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -59,10 +59,7 @@ class StockPickerSheet extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             children: [
-              Text(
-                'Add Stocks',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
+              Text('Add Stocks', style: Theme.of(context).textTheme.titleLarge),
               const Spacer(),
               IconButton(
                 icon: const Icon(Icons.close),
@@ -85,9 +82,10 @@ class StockPickerSheet extends StatelessWidget {
                 onTap: isAdded
                     ? null
                     : () {
-                        context
-                            .read<WatchlistCubit>()
-                            .addSymbol(watchlistId, symbol);
+                        context.read<WatchlistCubit>().addSymbol(
+                          watchlistId,
+                          symbol,
+                        );
                         Navigator.of(context).pop();
                       },
               );
@@ -101,11 +99,7 @@ class StockPickerSheet extends StatelessWidget {
 }
 
 class _PickerRow extends StatelessWidget {
-  const _PickerRow({
-    required this.symbol,
-    required this.isAdded,
-    this.onTap,
-  });
+  const _PickerRow({required this.symbol, required this.isAdded, this.onTap});
 
   final StockSymbol symbol;
   final bool isAdded;
@@ -119,9 +113,7 @@ class _PickerRow extends StatelessWidget {
         final isGain = quote.change.paise >= 0;
         final color = isAdded
             ? Theme.of(context).colorScheme.outline
-            : isGain
-                ? const Color(0xFF16A34A)
-                : const Color(0xFFDC2626);
+            : context.marketColors.forSign(isGain);
 
         return ListTile(
           onTap: onTap,
@@ -153,8 +145,9 @@ class _PickerRow extends StatelessWidget {
                     color: Theme.of(context).colorScheme.outline,
                   ),
                   side: BorderSide.none,
-                  backgroundColor:
-                      Theme.of(context).colorScheme.surfaceContainerHighest,
+                  backgroundColor: Theme.of(
+                    context,
+                  ).colorScheme.surfaceContainerHighest,
                 )
               : Column(
                   mainAxisAlignment: MainAxisAlignment.center,

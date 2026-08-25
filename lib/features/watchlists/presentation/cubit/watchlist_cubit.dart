@@ -12,13 +12,13 @@ part 'watchlist_state.dart';
 
 class WatchlistCubit extends Cubit<WatchlistState> {
   WatchlistCubit({required TradingStateCubit tradingStateCubit})
-      : _tradingStateCubit = tradingStateCubit,
-        super(
-          WatchlistState(
-            watchlists: tradingStateCubit.state.tradingState?.watchlists ?? [],
-            selectedIndex: 0,
-          ),
-        ) {
+    : _tradingStateCubit = tradingStateCubit,
+      super(
+        WatchlistState(
+          watchlists: tradingStateCubit.state.tradingState?.watchlists ?? [],
+          selectedIndex: 0,
+        ),
+      ) {
     // TradingStateCubit.load() is async — sync once data arrives
     _subscription = tradingStateCubit.stream.listen((viewState) {
       if (viewState.tradingState != null) {
@@ -37,7 +37,6 @@ class WatchlistCubit extends Cubit<WatchlistState> {
   }
 
   // ── Watchlist CRUD ──────────────────────────────────────────────────────────
-
 
   Future<void> createWatchlist(String name) async {
     final trimmed = name.trim();
@@ -85,9 +84,7 @@ class WatchlistCubit extends Cubit<WatchlistState> {
     final updated = [
       for (final w in state.watchlists)
         if (w.id == watchlistId)
-          w.copyWith(
-            symbols: w.symbols.where((s) => s != symbol).toList(),
-          )
+          w.copyWith(symbols: w.symbols.where((s) => s != symbol).toList())
         else
           w,
     ];
@@ -102,9 +99,7 @@ class WatchlistCubit extends Cubit<WatchlistState> {
     final watchlist = state.watchlists.firstWhere((w) => w.id == watchlistId);
     final symbols = [...watchlist.symbols];
     final item = symbols.removeAt(oldIndex);
-    // ReorderableListView passes the index before removal, adjust if needed
-    final insertAt = newIndex > oldIndex ? newIndex - 1 : newIndex;
-    symbols.insert(insertAt, item);
+    symbols.insert(newIndex, item);
     final updated = [
       for (final w in state.watchlists)
         if (w.id == watchlistId) w.copyWith(symbols: symbols) else w,

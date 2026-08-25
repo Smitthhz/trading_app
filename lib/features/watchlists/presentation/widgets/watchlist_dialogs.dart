@@ -31,9 +31,7 @@ Future<bool> showDeleteWatchlistConfirmation(
     context: context,
     builder: (context) => AlertDialog(
       title: const Text('Delete Watchlist'),
-      content: Text(
-        'Delete "$watchlistName"? This cannot be undone.',
-      ),
+      content: Text('Delete "$watchlistName"? This cannot be undone.'),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),

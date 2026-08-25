@@ -10,7 +10,7 @@
 | Phase 3 — Watchlists | ✅ **Complete** | 100% |
 | Phase 4 — Buy/Sell Ticket | ✅ **Complete** | 100% |
 | Phase 5 — Holdings & Live P&L | ✅ **Complete** | 100% |
-| Phase 6 — Quality, Tests & Submission | 🟡 **Partial** | ~50% |
+| Phase 6 — Quality, Tests & Submission | 🟡 **Partial** | ~80% |
 
 ---
 
@@ -106,7 +106,7 @@ All exit criteria met.
 
 ---
 
-## Phase 6 — Quality, Tests & Submission 🟡 Partial (~35%)
+## Phase 6 — Quality, Tests & Submission 🟡 Partial (~80%)
 
 **Done:**
 - ✅ `money_test.dart` — paise arithmetic & formatting
@@ -114,10 +114,16 @@ All exit criteria met.
 - ✅ `quote_test.dart` — Quote entity tests
 - ✅ `execute_order_test.dart` — buy/sell use case validation
 - ✅ `shared_preferences_trading_state_repository_test.dart` — persistence round-trips
+- ✅ Widget tests: `watchlist_page_test.dart` (empty state → add stock → duplicate-prevention chip), `order_ticket_page_test.dart` (validation gating → buy execution → confirmation), `holdings_page_test.dart` (empty state → buy → live holding reflected)
 - ✅ README created and pushed
 - ✅ `flutter analyze` — no issues
+- ✅ `flutter test` — full suite verified passing (12/12, 2026-08-25)
+- ✅ `dart format` — applied across `lib/` and `test/`
+
+**Bugs found and fixed while adding widget-test coverage (2026-08-25):**
+- Fixed a crash: `OrderBloc`'s constructor used `tradingStateCubit.state.tradingState!` (unsafe null-check) instead of the null-aware fallback pattern used elsewhere (e.g. `WatchlistCubit`). Any tap into the buy/sell ticket before `TradingStateCubit.load()` resolves crashed the app. `OrderTicketPage.push()` now guards on this and shows a snackbar instead.
+- Fixed a layout bug: `OrderConfirmationPage`'s content column wasn't scrollable and overflowed on short screens. Wrapped the detail card in `SingleChildScrollView` with fixed action buttons below.
 
 **Missing:**
-- ❌ Widget tests for watchlist/ticket/holdings
-- ❌ `flutter test` full pass not verified
+- ❌ Manual end-to-end scenario pass (restart persistence, duplicate-stock quotes, reorder, stress ticks, insufficient balance, invalid sells, zero-qty holding removal)
 - ❌ Walkthrough video

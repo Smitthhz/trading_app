@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../app/presentation/cubit/theme_cubit.dart';
 import '../../../market/presentation/pages/market_overview_page.dart';
+import '../../../orders/presentation/pages/order_history_page.dart';
 import '../../../watchlists/presentation/pages/watchlist_page.dart';
 import '../../../holdings/presentation/pages/holdings_page.dart';
 import '../cubit/home_navigation_cubit.dart';
@@ -9,7 +11,7 @@ import '../cubit/home_navigation_cubit.dart';
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  static const _titles = ['Market', 'Watchlists', 'Holdings'];
+  static const _titles = ['Market', 'Watchlists', 'Holdings', 'Activity'];
 
   @override
   Widget build(BuildContext context) {
@@ -19,14 +21,19 @@ class HomePage extends StatelessWidget {
           appBar: AppBar(
             title: Text(_titles[selectedIndex]),
             actions: [
-              // Debug speed toggle — only shown on the Market tab
-              if (selectedIndex == 0) const MarketSpeedToggle(),
+              // Market-only controls — only shown on the Market tab
+              if (selectedIndex == 0) ...[
+                const MarketFeedToggle(),
+                const MarketSpeedToggle(),
+              ],
+              const _ThemeToggleButton(),
             ],
           ),
           body: switch (selectedIndex) {
             0 => const MarketOverviewPage(),
             1 => const WatchlistPage(),
-            _ => const HoldingsPage(),
+            2 => const HoldingsPage(),
+            _ => const OrderHistoryPage(),
           },
           bottomNavigationBar: NavigationBar(
             selectedIndex: selectedIndex,
@@ -49,8 +56,37 @@ class HomePage extends StatelessWidget {
                 selectedIcon: Icon(Icons.account_balance_wallet),
                 label: 'Holdings',
               ),
+              NavigationDestination(
+                icon: Icon(Icons.receipt_long_outlined),
+                selectedIcon: Icon(Icons.receipt_long),
+                label: 'Activity',
+              ),
             ],
           ),
+        );
+      },
+    );
+  }
+}
+
+/// Cycles system → light → dark on tap. The icon reflects the current
+/// preference (not the resolved brightness) so the state is unambiguous.
+class _ThemeToggleButton extends StatelessWidget {
+  const _ThemeToggleButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ThemeCubit, ThemeMode>(
+      builder: (context, mode) {
+        final (icon, tooltip) = switch (mode) {
+          ThemeMode.system => (Icons.brightness_auto_outlined, 'Theme: system'),
+          ThemeMode.light => (Icons.light_mode_outlined, 'Theme: light'),
+          ThemeMode.dark => (Icons.dark_mode_outlined, 'Theme: dark'),
+        };
+        return IconButton(
+          tooltip: tooltip,
+          icon: Icon(icon),
+          onPressed: context.read<ThemeCubit>().cycle,
         );
       },
     );

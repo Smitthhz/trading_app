@@ -8,6 +8,7 @@ import '../../features/market/data/datasources/mock_market_data_feed.dart';
 import '../../features/market/data/repositories/market_repository_impl.dart';
 import '../../features/market/domain/repositories/market_repository.dart';
 import '../../features/market/presentation/cubit/market_cubit.dart';
+import '../presentation/cubit/theme_cubit.dart';
 import '../presentation/cubit/trading_state_cubit.dart';
 import '../../features/watchlists/presentation/cubit/watchlist_cubit.dart';
 import '../../features/holdings/presentation/cubit/holdings_cubit.dart';
@@ -50,5 +51,8 @@ Future<void> configureDependencies({SharedPreferences? preferences}) async {
   );
   serviceLocator.registerFactory(
     () => HoldingsCubit(tradingStateCubit: serviceLocator()),
+  );
+  serviceLocator.registerFactory(
+    () => ThemeCubit(preferences: serviceLocator()),
   );
 }

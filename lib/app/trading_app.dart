@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../core/theme/app_theme.dart';
 import 'di/service_locator.dart';
+import 'presentation/cubit/theme_cubit.dart';
 import 'presentation/cubit/trading_state_cubit.dart';
 import '../features/home/presentation/cubit/home_navigation_cubit.dart';
 import '../features/home/presentation/pages/home_page.dart';
@@ -23,29 +24,36 @@ class TradingApp extends StatelessWidget {
         ),
       ],
       child: MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (_) => serviceLocator<HomeNavigationCubit>()),
-        BlocProvider(create: (_) => serviceLocator<MarketCubit>()),
-        BlocProvider(
-          create: (_) => serviceLocator<TradingStateCubit>()..load(),
-        ),
-        BlocProvider(
-          create: (context) => WatchlistCubit(
-            tradingStateCubit: context.read<TradingStateCubit>(),
+        providers: [
+          BlocProvider(create: (_) => serviceLocator<HomeNavigationCubit>()),
+          BlocProvider(create: (_) => serviceLocator<MarketCubit>()),
+          BlocProvider(
+            create: (_) => serviceLocator<TradingStateCubit>()..load(),
           ),
-        ),
-        BlocProvider(
-          create: (context) => HoldingsCubit(
-            tradingStateCubit: context.read<TradingStateCubit>(),
+          BlocProvider(
+            create: (context) => WatchlistCubit(
+              tradingStateCubit: context.read<TradingStateCubit>(),
+            ),
           ),
+          BlocProvider(
+            create: (context) => HoldingsCubit(
+              tradingStateCubit: context.read<TradingStateCubit>(),
+            ),
+          ),
+          BlocProvider(create: (_) => serviceLocator<ThemeCubit>()),
+        ],
+        child: BlocBuilder<ThemeCubit, ThemeMode>(
+          builder: (context, themeMode) {
+            return MaterialApp(
+              title: 'Trading App',
+              debugShowCheckedModeBanner: false,
+              theme: AppTheme.light,
+              darkTheme: AppTheme.dark,
+              themeMode: themeMode,
+              home: const HomePage(),
+            );
+          },
         ),
-      ],
-      child: MaterialApp(
-        title: 'Trading App',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.light,
-        home: const HomePage(),
-      ),
       ),
     );
   }

@@ -9,18 +9,10 @@ import '../../../../core/money/money.dart';
 import '../../../holdings/domain/entities/holding.dart';
 import '../../../market/presentation/cubit/market_cubit.dart';
 
-enum HoldingSortOrder {
-  pnlDescending,
-  pnlAscending,
-  symbolAz,
-  valueDescending,
-}
+enum HoldingSortOrder { pnlDescending, pnlAscending, symbolAz, valueDescending }
 
 class HoldingsState extends Equatable {
-  const HoldingsState({
-    required this.holdings,
-    required this.sortOrder,
-  });
+  const HoldingsState({required this.holdings, required this.sortOrder});
 
   final List<Holding> holdings;
   final HoldingSortOrder sortOrder;
@@ -55,7 +47,7 @@ class HoldingsState extends Equatable {
 
   /// Aggregate summary computed from [marketState].
   ({Money totalInvested, Money currentValue, Money pnl, int pnlBasisPoints})
-      summaryFor(MarketState marketState) {
+  summaryFor(MarketState marketState) {
     var totalInvested = Money.zero;
     var currentValue = Money.zero;
     for (final h in holdings) {
@@ -96,11 +88,12 @@ class HoldingsState extends Equatable {
 
 class HoldingsCubit extends Cubit<HoldingsState> {
   HoldingsCubit({required TradingStateCubit tradingStateCubit})
-      : super(HoldingsState(
-          holdings:
-              tradingStateCubit.state.tradingState?.holdings ?? const [],
+    : super(
+        HoldingsState(
+          holdings: tradingStateCubit.state.tradingState?.holdings ?? const [],
           sortOrder: HoldingSortOrder.pnlDescending,
-        )) {
+        ),
+      ) {
     _subscription = tradingStateCubit.stream.listen((viewState) {
       if (viewState.tradingState != null) {
         syncFrom(viewState.tradingState!);
@@ -136,5 +129,6 @@ class HoldingsCubit extends Cubit<HoldingsState> {
   static Money currentValue(Holding h, Money ltp) => ltp.multiply(h.quantity);
 
   /// P&L money for a single holding at a given LTP.
-  static Money pnl(Holding h, Money ltp) => currentValue(h, ltp) - h.investedValue;
+  static Money pnl(Holding h, Money ltp) =>
+      currentValue(h, ltp) - h.investedValue;
 }

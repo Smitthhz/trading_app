@@ -51,10 +51,7 @@ class HoldingsSummaryCard extends StatelessWidget {
                 children: [
                   const Text(
                     'Portfolio Value',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13,
-                    ),
+                    style: TextStyle(color: Colors.white70, fontSize: 13),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -74,16 +71,11 @@ class HoldingsSummaryCard extends StatelessWidget {
                           value: summary.totalInvested.formatted,
                         ),
                       ),
-                      Container(
-                        width: 1,
-                        height: 36,
-                        color: Colors.white24,
-                      ),
+                      Container(width: 1, height: 36, color: Colors.white24),
                       Expanded(
                         child: _SummaryTile(
                           label: 'Total P&L',
-                          value:
-                              '$sign${summary.pnl.formatted} ($pct%)',
+                          value: '$sign${summary.pnl.formatted} ($pct%)',
                           valueColor: isGain
                               ? const Color(0xFF86EFAC)
                               : const Color(0xFFFCA5A5),
@@ -150,8 +142,9 @@ class HoldingsSortBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final current = context
-        .select<HoldingsCubit, HoldingSortOrder>((c) => c.state.sortOrder);
+    final current = context.select<HoldingsCubit, HoldingSortOrder>(
+      (c) => c.state.sortOrder,
+    );
     final cubit = context.read<HoldingsCubit>();
 
     return SingleChildScrollView(

@@ -7,7 +7,11 @@ abstract interface class MarketRepository {
 
   double get ticksPerSecond;
 
+  bool get isRunning;
+
   void start();
+
+  void stop();
 
   void configureTickRate(double ticksPerSecond);
 

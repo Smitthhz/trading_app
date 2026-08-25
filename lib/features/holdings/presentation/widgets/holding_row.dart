@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/money/money.dart';
+import '../../../../core/theme/market_colors.dart';
+import '../../../../core/widgets/sparkline.dart';
 import '../../../market/presentation/cubit/market_cubit.dart';
 import '../../../orders/domain/entities/order_side.dart';
 import '../../../orders/presentation/pages/order_ticket_page.dart';
@@ -56,16 +58,16 @@ class _HoldingRowState extends State<HoldingRow>
       listenWhen: (prev, curr) =>
           prev.quoteFor(symbol) != curr.quoteFor(symbol),
       listener: (context, state) => _triggerFlash(),
-      buildWhen: (prev, curr) =>
-          prev.quoteFor(symbol) != curr.quoteFor(symbol),
+      buildWhen: (prev, curr) => prev.quoteFor(symbol) != curr.quoteFor(symbol),
       builder: (context, marketState) {
         final ltp = marketState.quoteFor(symbol).lastTradedPrice;
+        final history = marketState.historyFor(symbol);
         final pnl = HoldingsCubit.pnl(widget.holding, ltp);
         final currentVal = HoldingsCubit.currentValue(widget.holding, ltp);
         final basisPoints = HoldingsCubit.pnlBasisPoints(widget.holding, ltp);
         final isGain = pnl.paise >= 0;
-        final pnlColor =
-            isGain ? const Color(0xFF16A34A) : const Color(0xFFDC2626);
+        final marketColors = context.marketColors;
+        final pnlColor = marketColors.forSign(isGain);
         final flashColor = pnlColor;
 
         return AnimatedBuilder(
@@ -77,14 +79,14 @@ class _HoldingRowState extends State<HoldingRow>
           child: InkWell(
             onTap: () => OrderTicketPage.push(context, symbol),
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
                 children: [
                   // ── Avatar ───────────────────────────────────────────────
                   CircleAvatar(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.primaryContainer,
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.primaryContainer,
                     child: Text(
                       symbol.value.substring(0, 1),
                       style: TextStyle(
@@ -110,13 +112,21 @@ class _HoldingRowState extends State<HoldingRow>
                           '${widget.holding.quantity} shares · avg ${widget.holding.averageCost.formatted}',
                           style: TextStyle(
                             fontSize: 11,
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ],
                     ),
                   ),
+                  // ── Sparkline ──────────────────────────────────────────────
+                  SizedBox(
+                    width: 44,
+                    height: 28,
+                    child: Sparkline(values: history, color: pnlColor),
+                  ),
+                  const SizedBox(width: 8),
                   // ── Current value + P&L ───────────────────────────────────
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -142,7 +152,7 @@ class _HoldingRowState extends State<HoldingRow>
                     children: [
                       _MiniTradeButton(
                         icon: Icons.add,
-                        color: const Color(0xFF16A34A),
+                        color: marketColors.gain,
                         onTap: () => OrderTicketPage.push(
                           context,
                           symbol,
@@ -152,7 +162,7 @@ class _HoldingRowState extends State<HoldingRow>
                       const SizedBox(height: 4),
                       _MiniTradeButton(
                         icon: Icons.remove,
-                        color: const Color(0xFFDC2626),
+                        color: marketColors.loss,
                         onTap: () => OrderTicketPage.push(
                           context,
                           symbol,
@@ -183,8 +193,9 @@ class _PnLBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isGain ? const Color(0xFF16A34A) : const Color(0xFFDC2626);
-    final bg = isGain ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2);
+    final marketColors = context.marketColors;
+    final color = marketColors.forSign(isGain);
+    final bg = marketColors.containerForSign(isGain);
     final sign = isGain ? '+' : '';
     final pct = _fmtBp(basisPoints);
     return Container(
